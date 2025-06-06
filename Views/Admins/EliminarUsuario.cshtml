@@ -1,0 +1,32 @@
+﻿@model SisAlmacenProductos.Models.User
+
+@{
+    ViewBag.Title = "Confirmar Eliminación";
+}
+
+<h2>¿Estás seguro que deseas eliminar este usuario?</h2>
+
+<div class="alert alert-danger">
+    <strong>¡Advertencia!</strong> Esta acción no se puede deshacer.
+</div>
+
+<div>
+    <dl class="row">
+        <dt class="col-sm-2">ID:</dt>
+        <dd class="col-sm-10">@Model.Id</dd>
+
+        <dt class="col-sm-2">Usuario:</dt>
+        <dd class="col-sm-10">@Model.Username</dd>
+
+        <dt class="col-sm-2">Rol:</dt>
+        <dd class="col-sm-10">@Model.Role</dd>
+    </dl>
+</div>
+
+<form asp-action="EliminarUsuario" method="post">
+    <input type="hidden" asp-for="Id" />
+    <button type="submit" class="btn btn-danger">
+        <i class="bi bi-trash"></i> Confirmar Eliminación
+    </button>
+    <a asp-action="RegistrarUsuario" class="btn btn-secondary">Cancelar</a>
+</form>

@@ -1,0 +1,88 @@
+﻿@model List<SisAlmacenProductos.Models.Producto>
+@{
+    ViewBag.Title = "Gestión de Productos";
+    var rolUsuario = Context.Session.GetString("Role");
+}
+
+<h2 class="mb-4">Gestión de Productos</h2>
+
+@if (rolUsuario != "Almacenero")
+{
+    <a asp-action="AgregarProducto" class="btn btn-success mb-3">
+        <i class="bi bi-plus-circle"></i> Agregar Producto
+    </a>
+}
+
+<a asp-action="ExportarExcel" class="btn btn-outline-success mb-3">
+    <i class="bi bi-file-earmark-excel"></i> Exportar a Excel
+</a>
+
+<table class="table table-bordered table-striped">
+    <thead class="table-dark">
+        <tr>
+            <th>Código</th>
+            <th>Nombre</th>
+            <th>Descripción</th>
+            <th>Marca</th>
+            <th>Categoría</th>
+            <th>Precio</th>
+            <th>Stock</th>
+            <th>Imagen</th>
+            <th>Acciones</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var producto in Model)
+        {
+            <tr>
+                <td>@producto.Codigo</td>
+                <td>@producto.Nombre</td>
+                <td>@producto.Descripcion</td>
+                <td>@producto.Marca</td>
+                <td>@producto.Categoria</td>
+                <td>S/. @producto.Precio</td>
+                <td>@producto.Stock</td>
+                <td>
+                    @if (!string.IsNullOrEmpty(producto.ImagenUrl))
+                    {
+                        <img src="@producto.ImagenUrl" alt="Imagen" width="60" />
+                    }
+                </td>
+                <td>
+                    @if (rolUsuario != "Almacenero")
+                    {
+                    <a class="btn btn-sm btn-primary" asp-action="EditarProducto" asp-route-id="@producto.Id">
+                        <i class="bi bi-pencil-square"></i>
+                    </a>
+
+
+                    <a class="btn btn-sm btn-danger" asp-action="EliminarProducto" asp-route-id="@producto.Id">
+                            <i class="bi bi-trash"></i>
+                    </a>
+                    }
+
+                    @if (rolUsuario == "Almacenero")
+                    {
+                        <!-- Botón Ingreso -->
+                        <form asp-action="Ingreso" asp-controller="Admin" method="post" class="d-inline">
+                            <input type="hidden" name="id" value="@producto.Id" />
+                            <input type="number" name="cantidad" class="form-control form-control-sm d-inline-block w-50" placeholder="+" min="1" required />
+                            <button type="submit" class="btn btn-sm btn-success mt-1">Ingreso</button>
+                        </form>
+
+                        <!-- Botón Salida -->
+                        <form asp-action="Salida" asp-controller="Admin" method="post" class="d-inline">
+                            <input type="hidden" name="id" value="@producto.Id" />
+                            <input type="number" name="cantidad" class="form-control form-control-sm d-inline-block w-50" placeholder="-" min="1" max="@producto.Stock" required />
+                            <button type="submit" class="btn btn-sm btn-warning mt-1">Salida</button>
+                        </form>
+                    }
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
+
+<a asp-controller="Admin" asp-action="DashboardAdmin" class="btn btn-secondary mt-3">
+    <i class="bi bi-arrow-left-circle"></i> Volver al Panel
+</a>

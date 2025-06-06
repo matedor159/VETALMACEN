@@ -1,0 +1,30 @@
+﻿@model SisAlmacenProductos.Models.Producto
+
+@{
+    ViewBag.Title = "Eliminar Producto";
+}
+
+<h2>¿Estás seguro que deseas eliminar este producto?</h2>
+
+<div class="alert alert-danger">
+    Esta acción no se puede deshacer.
+</div>
+
+<div class="card">
+    <div class="card-body">
+        <h4 class="card-title">@Model.Nombre</h4>
+        <p><strong>Categoría:</strong> @Model.Categoria</p>
+        <p><strong>Precio:</strong> S/. @Model.Precio</p>
+        <p><strong>Stock:</strong> @Model.Stock</p>
+        @if (!string.IsNullOrEmpty(Model.ImagenUrl))
+        {
+            <img src="@Model.ImagenUrl" alt="Imagen del producto" width="100" />
+        }
+    </div>
+</div>
+
+<form asp-action="EliminarProducto" method="post">
+    <input type="hidden" asp-for="Id" />
+    <button type="submit" class="btn btn-danger mt-3"><i class="bi bi-trash"></i> Eliminar</button>
+    <a asp-action="Productos" class="btn btn-secondary mt-3">Cancelar</a>
+</form>

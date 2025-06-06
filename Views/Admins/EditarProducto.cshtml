@@ -1,0 +1,64 @@
+﻿@model SisAlmacenProductos.Models.Producto
+
+@{
+    ViewBag.Title = "Editar Producto";
+}
+
+<h2>Editar Producto</h2>
+
+<form method="post">
+    @Html.AntiForgeryToken()
+
+    <div class="form-group">
+        <label for="Codigo">Código</label>
+        <input type="text" class="form-control" id="Codigo" name="Codigo" value="@Model?.Codigo" required />
+        @Html.ValidationMessageFor(model => model.Codigo, "", new { @class = "text-danger" })
+    </div>
+
+    <div class="form-group">
+        <label for="Nombre">Nombre</label>
+        <input type="text" class="form-control" id="Nombre" name="Nombre" value="@Model?.Nombre" required />
+        @Html.ValidationMessageFor(model => model.Nombre, "", new { @class = "text-danger" })
+    </div>
+
+    <div class="form-group">
+        <label for="Descripcion">Descripción</label>
+        <textarea class="form-control" id="Descripcion" name="Descripcion" rows="3" required>@Model?.Descripcion</textarea>
+        @Html.ValidationMessageFor(model => model.Descripcion, "", new { @class = "text-danger" })
+    </div>
+
+    <div class="form-group">
+        <label for="Marca">Marca</label>
+        <input type="text" class="form-control" id="Marca" name="Marca" value="@Model?.Marca" required />
+        @Html.ValidationMessageFor(model => model.Marca, "", new { @class = "text-danger" })
+    </div>
+
+    <div class="form-group">
+        <label for="Categoria">Categoría</label>
+        <input type="text" class="form-control" id="Categoria" name="Categoria" value="@Model?.Categoria" required />
+        @Html.ValidationMessageFor(model => model.Categoria, "", new { @class = "text-danger" })
+    </div>
+
+    <div class="form-group">
+        <label for="Precio">Precio</label>
+        <input type="number" class="form-control" id="Precio" name="Precio" step="0.01" value="@Model?.Precio" required />
+        @Html.ValidationMessageFor(model => model.Precio, "", new { @class = "text-danger" })
+    </div>
+
+    <div class="form-group">
+        <label for="Stock">Stock</label>
+        <input type="number" class="form-control" id="Stock" name="Stock" value="@Model?.Stock" required />
+        @Html.ValidationMessageFor(model => model.Stock, "", new { @class = "text-danger" })
+    </div>
+
+    <div class="form-group">
+        <label for="ImagenUrl">Imagen URL</label>
+        <input type="text" class="form-control" id="ImagenUrl" name="ImagenUrl" value="@Model?.ImagenUrl" />
+        @Html.ValidationMessageFor(model => model.ImagenUrl, "", new { @class = "text-danger" })
+    </div>
+
+    <input type="hidden" asp-for="Id" />
+
+    <button type="submit" class="btn btn-primary">Guardar Cambios</button>
+    <a href="@Url.Action("Productos", "Admin")" class="btn btn-secondary">Cancelar</a>
+</form>
