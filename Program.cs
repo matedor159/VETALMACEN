@@ -4,36 +4,39 @@ using SisAlmacenProductos.Data;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Agregamos ApplicationDbContext con conexión a MySQL
+// Agregamos ApplicationDbContext con conexiï¿½n a MySQL
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
     options.UseMySql(
         builder.Configuration.GetConnectionString("DefaultConnection"),
-        new MySqlServerVersion(new Version(8, 0, 23)) // Cambia si usas otra versión
+        new MySqlServerVersion(new Version(8, 0, 23)) // Cambia si usas otra versiï¿½n
     ));
+
+// âœ… Agregamos servicio de cache en memoria
+builder.Services.AddMemoryCache();
 
 // Agregamos soporte para controladores con vistas
 builder.Services.AddControllersWithViews();
 
-// Agregamos servicios de sesión
+// Agregamos servicios de sesiï¿½n
 builder.Services.AddSession(options =>
 {
-    options.IdleTimeout = TimeSpan.FromMinutes(30); // Tiempo de sesión
+    options.IdleTimeout = TimeSpan.FromMinutes(30); // Tiempo de sesiï¿½n
     options.Cookie.HttpOnly = true;
     options.Cookie.IsEssential = true;
 });
 
-// ? Agregamos servicios de autenticación con cookies
+// ? Agregamos servicios de autenticaciï¿½n con cookies
 builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
     .AddCookie(options =>
     {
-        options.LoginPath = "/Account/Login";     // Redirigir al login si no está autenticado
-        options.LogoutPath = "/Account/Logout";   // Para cerrar sesión
-        options.ExpireTimeSpan = TimeSpan.FromMinutes(30); // Opcional: duración de la cookie
+        options.LoginPath = "/Account/Login";     // Redirigir al login si no estï¿½ autenticado
+        options.LogoutPath = "/Account/Logout";   // Para cerrar sesiï¿½n
+        options.ExpireTimeSpan = TimeSpan.FromMinutes(30); // Opcional: duraciï¿½n de la cookie
     });
 
 var app = builder.Build();
 
-// Configuración del pipeline HTTP
+// Configuraciï¿½n del pipeline HTTP
 if (!app.Environment.IsDevelopment())
 {
     app.UseExceptionHandler("/Home/Error");
@@ -46,8 +49,8 @@ app.UseStaticFiles();
 app.UseRouting();
 
 app.UseSession();           // ?? Primero sesiones
-app.UseAuthentication();    // ?? Luego autenticación
-app.UseAuthorization();     // ? Finalmente autorización
+app.UseAuthentication();    // ?? Luego autenticaciï¿½n
+app.UseAuthorization();     // ? Finalmente autorizaciï¿½n
 
 // Ruta por defecto al Login
 app.MapControllerRoute(

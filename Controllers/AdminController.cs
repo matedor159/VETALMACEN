@@ -8,7 +8,9 @@ using System.IO;
 using System.Security.Claims;
 using Microsoft.EntityFrameworkCore;
 using SisAlmacenProductos.PruebasUnitarias;
-
+using System.Security.Cryptography;
+using Microsoft.AspNetCore.Cryptography.KeyDerivation;
+using Microsoft.AspNetCore.Authorization;
 
 namespace SisAlmacenProductos.Controllers
 {
@@ -16,7 +18,7 @@ namespace SisAlmacenProductos.Controllers
     {
         private readonly ApplicationDbContext _context;
         private readonly UsuariosTests _usuariosTests;
-        private readonly ProductoTests _productoTests;  
+        private readonly ProductoTests _productoTests;
 
         public AdminController(ApplicationDbContext context)
         {
@@ -28,13 +30,18 @@ namespace SisAlmacenProductos.Controllers
 
         public IActionResult VistaCliente()
         {
-            var productos = _context.Productos.ToList();
-            return View("~/Views/Admins/VistaCliente.cshtml", productos);
+            return RedirectToAction("DashboardAdmin", "Admin");
         }
 
         public IActionResult DashboardAdmin()
         {
             var role = HttpContext.Session.GetString("Role");
+
+            if (string.IsNullOrEmpty(role))
+            {
+                // Si no hay rol en sesión, redirigir a login
+                return RedirectToAction("Login", "Account");
+            }
 
             if (role == "Cliente")
             {
@@ -71,29 +78,6 @@ namespace SisAlmacenProductos.Controllers
         {
             if (ModelState.IsValid)
             {
-                // Validaciones directas del código
-
-                // Validación de código no mayor a 5 caracteres
-                if (producto.Codigo.Length > 5)
-                {
-                    TempData["ErrorCodigo"] = "❌ El código no debe ser mayor a 5 caracteres.";
-                    return View("~/Views/Admins/AgregarProducto.cshtml", producto);
-                }
-
-                // Validación de precio no negativo
-                if (producto.Precio < 0)
-                {
-                    TempData["ErrorPrecio"] = "❌ El precio no puede ser negativo.";
-                    return View("~/Views/Admins/AgregarProducto.cshtml", producto);
-                }
-
-                // Validación de URL de imagen con HTTPS
-                if (!producto.ImagenUrl.StartsWith("https://"))
-                {
-                    TempData["ErrorImagenUrl"] = "❌ La URL de la imagen debe comenzar con 'https://'.";
-                    return View("~/Views/Admins/AgregarProducto.cshtml", producto);
-                }
-
                 // Si todas las validaciones son correctas, guardamos el producto
                 _context.Productos.Add(producto);
                 await _context.SaveChangesAsync();
@@ -122,29 +106,6 @@ namespace SisAlmacenProductos.Controllers
         {
             if (ModelState.IsValid)
             {
-                // Validaciones directas del código
-
-                // Validación de código no mayor a 5 caracteres
-                if (producto.Codigo.Length > 5)
-                {
-                    TempData["ErrorCodigo"] = "❌ El código no debe ser mayor a 5 caracteres.";
-                    return View("~/Views/Admins/EditarProducto.cshtml", producto);
-                }
-
-                // Validación de precio no negativo
-                if (producto.Precio < 0)
-                {
-                    TempData["ErrorPrecio"] = "❌ El precio no puede ser negativo.";
-                    return View("~/Views/Admins/EditarProducto.cshtml", producto);
-                }
-
-                // Validación de URL de imagen con HTTPS
-                if (!producto.ImagenUrl.StartsWith("https://"))
-                {
-                    TempData["ErrorImagenUrl"] = "❌ La URL de la imagen debe comenzar con 'https://'.";
-                    return View("~/Views/Admins/EditarProducto.cshtml", producto);
-                }
-
                 // Si todas las validaciones son correctas, actualizamos el producto
                 _context.Productos.Update(producto);
                 await _context.SaveChangesAsync();
@@ -154,8 +115,8 @@ namespace SisAlmacenProductos.Controllers
             return View("~/Views/Admins/EditarProducto.cshtml", producto);
         }
 
-    // Acción GET para confirmar eliminación
-    public IActionResult EliminarProducto(int id)
+        // Acción GET para confirmar eliminación
+        public IActionResult EliminarProducto(int id)
         {
             var producto = _context.Productos.Find(id);
 
@@ -213,26 +174,9 @@ namespace SisAlmacenProductos.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> AgregarUsuario(User usuario)
         {
-            // Validar si el username ya existe
-            bool usernameExiste = await _context.Users.AnyAsync(u => u.Username == usuario.Username);
-            if (usernameExiste)
-            {
-                ModelState.AddModelError("Username", "El nombre de usuario ya existe. Elija otro.");
-            }
-
-            // Validar si la contraseña es fuerte
-            if (string.IsNullOrWhiteSpace(usuario.Password) ||
-                usuario.Password.Length < 8 ||
-                !usuario.Password.Any(char.IsUpper) ||
-                !usuario.Password.Any(char.IsLower) ||
-                !usuario.Password.Any(char.IsDigit) ||
-                !usuario.Password.Any(ch => "!@#$%^&*()-_=+[{]}\\|;:'\",<.>/?".Contains(ch)))
-            {
-                ModelState.AddModelError("Password", "La contraseña debe tener al menos 8 caracteres, incluir mayúsculas, minúsculas, números y un carácter especial.");
-            }
-
             if (ModelState.IsValid)
             {
+                usuario.Password = HashPassword(usuario.Password);
                 _context.Users.Add(usuario);
                 await _context.SaveChangesAsync();
 
@@ -267,6 +211,9 @@ namespace SisAlmacenProductos.Controllers
             {
                 try
                 {
+                    // hashear password
+                    usuario.Password = HashPassword(usuario.Password);
+
                     // Adjuntar el usuario al contexto
                     _context.Attach(usuario);
 
@@ -584,5 +531,22 @@ namespace SisAlmacenProductos.Controllers
             return View("~/Views/Admins/MisOrdenes.cshtml", ordenes);
         }
 
+        private string HashPassword(string password)
+        {
+            byte[] salt = new byte[128 / 8];
+            using (var rng = RandomNumberGenerator.Create())
+            {
+                rng.GetBytes(salt);
+            }
+
+            string hashed = Convert.ToBase64String(KeyDerivation.Pbkdf2(
+                password: password,
+                salt: salt,
+                prf: KeyDerivationPrf.HMACSHA256,
+                iterationCount: 10000,
+                numBytesRequested: 256 / 8));
+
+            return $"{Convert.ToBase64String(salt)}.{hashed}";
+        }
     }
 }

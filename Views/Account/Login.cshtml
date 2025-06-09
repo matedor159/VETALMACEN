@@ -23,7 +23,8 @@
                     </label>
                     <div class="input-group">
                         <span class="input-group-text"><i class="bi bi-person-circle"></i></span>
-                        <input type="text" class="form-control" id="username" name="username" placeholder="Ingrese su usuario" required>
+                        <input type="text" class="form-control" id="username" name="username"
+                            placeholder="Ingrese su usuario" required>
                     </div>
                 </div>
 
@@ -33,7 +34,8 @@
                     </label>
                     <div class="input-group">
                         <span class="input-group-text"><i class="bi bi-shield-lock-fill"></i></span>
-                        <input type="password" class="form-control" id="password" name="password" placeholder="Ingrese su contraseña" required>
+                        <input type="password" class="form-control" id="password" name="password"
+                            placeholder="Ingrese su contraseña" required>
                     </div>
                 </div>
 
@@ -44,7 +46,9 @@
                         <div>@ViewBag.Error</div>
                     </div>
                 }
-
+                <div class="mb-3 d-flex justify-content-center">
+                    <div class="g-recaptcha" data-sitekey="6LcnLlorAAAAAFA7kBf6yBZxadmD1937DdvwFRnZ"></div>
+                </div>
                 <div class="d-grid">
                     <button type="submit" class="btn btn-primary">
                         <i class="bi bi-box-arrow-in-right me-1"></i>Ingresar
@@ -54,3 +58,10 @@
         </div>
     </div>
 </div>
+
+<script src="https://www.google.com/recaptcha/api.js" async defer></script>
+<script>
+    function onSubmit(token) {
+        document.getElementById("demo-form").submit();
+    }
+</script>
