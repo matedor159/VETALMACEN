@@ -16,13 +16,14 @@
 <table class="table table-bordered">
     <thead>
         <tr>
-            <th>ID</th>
+            @*<th>ID</th>*@
             <th>Cliente</th>
             <th>Producto</th>
             <th>Cantidad</th>
             <th>Estado</th>
             <th>Modificado Por</th>
             <th>Fecha</th>
+            <th>Hora</th>
             <th>Acciones</th>
         </tr>
     </thead>
@@ -30,13 +31,14 @@
         @foreach (var orden in Model)
         {
             <tr>
-                <td>@orden.Id</td>
+                @*<td>@orden.Id</td>*@
                 <td>@orden.Usuario.Username</td>
                 <td>@orden.Producto.Nombre</td>
                 <td>@orden.Cantidad</td>
                 <td>@orden.Estado</td>
                 <td>@(orden.ModificadoPor ?? "Sin modificar")</td>
-                <td>@orden.FechaSolicitud.ToString("g")</td>
+                <td>@orden.FechaSolicitud.ToString("dd/MM/yyyy")</td>
+                <td>@orden.FechaSolicitud.ToString("HH:mm")</td>
                 <td>
                     @if (orden.Estado == "Pendiente")
                     {

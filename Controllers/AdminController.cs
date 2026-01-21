@@ -28,36 +28,27 @@ namespace SisAlmacenProductos.Controllers
 
         }
 
+        [Authorize(Roles = "Cliente")]
         public IActionResult VistaCliente()
         {
-            return RedirectToAction("DashboardAdmin", "Admin");
+            var productos = _context.Productos.ToList();
+
+            // ✅ Esto buscará correctamente la vista si está en /Views/Admins/VistaCliente.cshtml
+            return View("~/Views/Admins/VistaCliente.cshtml", productos);
         }
 
+        [Authorize(Roles = "Administrador,Logistica,Almacenero")]
         public IActionResult DashboardAdmin()
         {
             var role = HttpContext.Session.GetString("Role");
-
-            if (string.IsNullOrEmpty(role))
-            {
-                // Si no hay rol en sesión, redirigir a login
-                return RedirectToAction("Login", "Account");
-            }
-
-            if (role == "Cliente")
-            {
-                var productos = _context.Productos.ToList();
-
-                // ✅ Esto buscará correctamente la vista si está en /Views/Admins/VistaCliente.cshtml
-                return View("~/Views/Admins/VistaCliente.cshtml", productos);
-            }
 
             ViewBag.Role = role;
             return View("~/Views/Admins/DashboardAdmin.cshtml");
         }
 
 
-
         // Acción para mostrar la lista de productos
+        [Authorize(Roles = "Administrador,Almacenero")]
         public IActionResult Productos()
         {
             var productos = _context.Productos.ToList();
@@ -65,6 +56,7 @@ namespace SisAlmacenProductos.Controllers
         }
 
         // Acción GET para agregar producto
+        [Authorize(Roles = "Administrador")]
         public IActionResult AgregarProducto()
         {
             var producto = new Producto();
@@ -88,6 +80,7 @@ namespace SisAlmacenProductos.Controllers
         }
 
         // Acción GET para editar producto
+        [Authorize(Roles = "Administrador")]
         public IActionResult EditarProducto(int id)
         {
             var producto = _context.Productos.Find(id);
@@ -147,6 +140,7 @@ namespace SisAlmacenProductos.Controllers
 
 
         // Muestra lista de usuarios
+        [Authorize(Roles = "Administrador")]
         public IActionResult RegistrarUsuario()
         {
             var usuarios = _context.Users.ToList();
@@ -162,6 +156,7 @@ namespace SisAlmacenProductos.Controllers
 
 
         // GET: Muestra formulario de registro
+        [Authorize(Roles = "Administrador")]
         public IActionResult AgregarUsuario()
         {
             return View("~/Views/Admins/RegistrarUsuario.cshtml");
@@ -192,6 +187,7 @@ namespace SisAlmacenProductos.Controllers
 
 
         // Acción GET para mostrar el formulario de edición
+        [Authorize(Roles = "Administrador")]
         public IActionResult EditarUsuario(int id)
         {
             var usuario = _context.Users.Find(id);
@@ -432,6 +428,7 @@ namespace SisAlmacenProductos.Controllers
         }
 
         // ✅ Vista: Solicitudes de clientes
+        [Authorize(Roles = "Administrador,Logistica")]
         public async Task<IActionResult> Solicitudes()
         {
             var ordenes = await _context.Ordenes
@@ -512,6 +509,7 @@ namespace SisAlmacenProductos.Controllers
             return RedirectToAction("Cliente", "Home");
         }
 
+        [Authorize(Roles = "Cliente")]
         public async Task<IActionResult> MisOrdenes()
         {
             var username = User.Identity.Name;
@@ -547,6 +545,18 @@ namespace SisAlmacenProductos.Controllers
                 numBytesRequested: 256 / 8));
 
             return $"{Convert.ToBase64String(salt)}.{hashed}";
+        }
+
+        private IActionResult? CheckRole(string currentRole)
+        {
+            var role = HttpContext.Session.GetString("Role");
+
+            if (string.IsNullOrEmpty(role) || role != currentRole)
+            {
+                return RedirectToAction("Login", "Account");
+            }
+
+            return null; // todo bien, continuar
         }
     }
 }

@@ -3,7 +3,7 @@ using Microsoft.EntityFrameworkCore;
 using SisAlmacenProductos.Data;
 
 var builder = WebApplication.CreateBuilder(args);
-
+ 
 // Agregamos ApplicationDbContext con conexi�n a MySQL
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
     options.UseMySql(
@@ -31,6 +31,7 @@ builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationSc
     {
         options.LoginPath = "/Account/Login";     // Redirigir al login si no est� autenticado
         options.LogoutPath = "/Account/Logout";   // Para cerrar sesi�n
+        options.AccessDeniedPath = "/Account/AccessDenied";
         options.ExpireTimeSpan = TimeSpan.FromMinutes(30); // Opcional: duraci�n de la cookie
     });
 

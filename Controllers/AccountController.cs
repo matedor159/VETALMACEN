@@ -26,11 +26,13 @@ namespace SisAlmacenProductos.Controllers
 
         public IActionResult Login()
         {
-            var role = HttpContext.Session.GetString("Role");
-
-            if (!string.IsNullOrEmpty(role))
+            if (User.Identity.IsAuthenticated)
             {
-                return RedirectToAction("DashboardAdmin", "Admin");
+                if (User.IsInRole("Administrador") || User.IsInRole("Almacenero") || User.IsInRole("Logistica"))
+                    return RedirectToAction("DashboardAdmin", "Admin");
+
+                if (User.IsInRole("Cliente"))
+                    return RedirectToAction("VistaCliente", "Admin");
             }
 
             return View();
@@ -89,6 +91,11 @@ namespace SisAlmacenProductos.Controllers
                 HttpContext.Session.SetString("Role", user.Role);
                 HttpContext.Session.SetString("Username", user.Username);
 
+                if (user.Role == "Cliente")
+                {
+                    return RedirectToAction("VistaCliente", "Admin");
+                }
+
                 return RedirectToAction("DashboardAdmin", "Admin");
             }
             else
@@ -124,6 +131,10 @@ namespace SisAlmacenProductos.Controllers
 
         private bool VerifyHashedPassword(string hashedPasswordWithSalt, string providedPassword)
         {
+            // ✅ Compatibilidad: si en BD está en texto plano
+            if (!hashedPasswordWithSalt.Contains('.'))
+                return hashedPasswordWithSalt == providedPassword;
+
             var parts = hashedPasswordWithSalt.Split('.');
             if (parts.Length != 2)
                 return false;
@@ -172,6 +183,14 @@ namespace SisAlmacenProductos.Controllers
             dynamic result = Newtonsoft.Json.JsonConvert.DeserializeObject(json);
 
             return result.success == true;
+        }
+
+        /*==============================
+        =            vistas            =
+        ==============================*/
+        public IActionResult AccessDenied()
+        {
+            return View();
         }
     }
 }

@@ -1,0 +1,16 @@
+﻿# Visual Studio
+.vs/
+bin/
+obj/
+
+# User-specific
+*.user
+*.suo
+
+# Tests
+TestResults/
+
+# Logs / cache / db
+*.log
+*.db
+*.cache

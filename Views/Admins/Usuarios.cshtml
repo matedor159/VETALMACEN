@@ -22,10 +22,11 @@
 <table class="table table-bordered table-striped">
     <thead>
         <tr>
-            <th>ID</th>
+            @*<th>ID</th>*@
             <th>Usuario</th>
             <th>Rol</th>
-            <th>Creado el</th>
+            <th>Fecha</th>
+            <th>Hora</th>
             <th>Acciones</th>
         </tr>
     </thead>
@@ -33,10 +34,11 @@
         @foreach (var usuario in Model)
         {
             <tr>
-                <td>@usuario.Id</td>
+                @*<td>@usuario.Id</td>*@
                 <td>@usuario.Username</td>
                 <td>@usuario.Role</td>
-                <td>@usuario.CreatedAt.ToString("dd/MM/yyyy HH:mm")</td>
+                <td>@usuario.CreatedAt.ToString("dd/MM/yyyy")</td>
+                <td>@usuario.CreatedAt.ToString("HH:mm")</td>
                 <td>
                     <a asp-action="EditarUsuario" asp-route-id="@usuario.Id" class="btn btn-warning btn-sm">
                         <i class="bi bi-pencil-square"></i> Editar

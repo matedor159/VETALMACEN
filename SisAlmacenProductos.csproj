@@ -19,4 +19,20 @@
     <Folder Include="wwwroot\imagenes\" />
   </ItemGroup>
 
+  <ItemGroup>
+    <None Update=".tt">
+      <Generator>TextTemplatingFileGenerator</Generator>
+      <LastGenOutput>.txt</LastGenOutput>
+    </None>
+    <None Update=".txt">
+      <DesignTime>True</DesignTime>
+      <AutoGen>True</AutoGen>
+      <DependentUpon>.tt</DependentUpon>
+    </None>
+  </ItemGroup>
+
+  <ItemGroup>
+    <Service Include="{508349b6-6b84-4df5-91f0-309beebad82d}" />
+  </ItemGroup>
+
 </Project>

@@ -41,7 +41,7 @@
     </div>
 
     <div class="form-group">
-        <label asp-for="Categoria" class="form-label"></label>
+        <label class="form-label">Categoría</label>
         @Html.TextBoxFor(m => m.Categoria, new { @class = "form-control" })
         @Html.ValidationMessageFor(m => m.Categoria, "", new { @class = "text-danger" })
     </div>
@@ -59,7 +59,7 @@
     </div>
 
     <div class="form-group">
-        <label asp-for="ImagenUrl" class="form-label"></label>
+        <label class="form-label">Agregar URL</label>
         @Html.TextBoxFor(m => m.ImagenUrl, new { @class = "form-control" })
         @Html.ValidationMessageFor(m => m.ImagenUrl, errorImagenUrl ?? "", new { @class = "text-danger" })
     </div>

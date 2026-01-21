@@ -19,6 +19,7 @@ else
                 <th>Cantidad</th>
                 <th>Estado</th>
                 <th>Fecha de Solicitud</th>
+                <th>Hora de Solicitud</th>
             </tr>
         </thead>
         <tbody>
@@ -28,7 +29,8 @@ else
                     <td>@orden.Producto.Nombre</td>
                     <td>@orden.Cantidad</td>
                     <td>@orden.Estado</td>
-                    <td>@orden.FechaSolicitud.ToString("dd/MM/yyyy HH:mm")</td>
+                    <td>@orden.FechaSolicitud.ToString("dd/MM/yyyy")</td>
+                    <td>@orden.FechaSolicitud.ToString("HH:mm")</td>
                 </tr>
             }
         </tbody>
