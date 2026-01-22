@@ -217,7 +217,7 @@ CREATE TABLE `producto` (
   `SubCategoriaId` int(11) NOT NULL,
   `Precio` decimal(10,2) NOT NULL,
   `Stock` int(11) NOT NULL DEFAULT 0,
-  `ImagenUrl` varchar(255) DEFAULT NULL
+  `ImagenUrl` varchar(512) DEFAULT NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --

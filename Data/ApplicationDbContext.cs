@@ -7,7 +7,8 @@ namespace SisAlmacenProductos.Data
         public DbSet<User> Users { get; set; }
         public DbSet<Producto> Productos { get; set; }
         public DbSet<Orden> Ordenes { get; set; }
-
+        public DbSet<Categoria> Categorias { get; set; }
+        public DbSet<SubCategoria> SubCategorias { get; set; }
 
         public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options)
             : base(options)
