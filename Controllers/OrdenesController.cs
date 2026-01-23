@@ -57,7 +57,7 @@ namespace SisAlmacenProductos.Controllers
                 .Include(o => o.Usuario)
                 .ToListAsync();
 
-            return View(ordenes);
+            return View("~/Views/Admins/Solicitudes.cshtml", ordenes);
         }
 
         // ADMIN: Cambiar estado

@@ -29,15 +29,15 @@
     </div>
 
     <div class="form-group">
-        <label asp-for="Role" class="form-label">Rol</label>
-        <select asp-for="Role" class="form-control">
+        <label asp-for="RolId" class="form-label">Rol</label>
+        <select asp-for="RolId" class="form-control">
             <option value="">-- Selecciona un rol --</option>
-            <option value="Administrador">Administrador</option>
-            <option value="Almacenero">Almacenero</option>
-            <option value="Cliente">Cliente</option>
-            <option value="Logistica">Logística</option>
+            <option value="1">Administrador</option>
+            <option value="2">Almacenero</option>
+            <option value="3">Cliente</option>
+            <option value="4">Logística</option>
         </select>
-        <span asp-validation-for="Role" class="text-danger"></span>
+        <span asp-validation-for="RolId" class="text-danger"></span>
     </div>
 
     <button type="submit" class="btn btn-success mt-3">Registrar</button>

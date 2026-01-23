@@ -37,18 +37,10 @@
         @Html.ValidationMessageFor(m => m.Marca, "", new { @class = "text-danger" })
     </div>
 
-    <div class="mb-3">
-        <label class="form-label">Subcategoría</label>
-        <select asp-for="SubCategoriaId" class="form-select">
-            <option value="">-- Seleccione --</option>
-            @foreach (var s in subcats)
-            {
-                <option value="@s.Id" @(s.Id == Model.SubCategoriaId ? "selected" : "")>
-                    @($"{s.Categoria?.Nombre ?? "SinCat"} - {s.Nombre}")
-                </option>
-            }
-        </select>
-        @Html.ValidationMessageFor(m => m.SubCategoriaId, "", new { @class = "text-danger" })
+    <div class="form-group">
+        <label class="form-label">Categoría</label>
+        @Html.TextBoxFor(m => m.Categoria, new { @class = "form-control" })
+        @Html.ValidationMessageFor(m => m.Categoria, "", new { @class = "text-danger" })
     </div>
 
     <div class="mb-3">

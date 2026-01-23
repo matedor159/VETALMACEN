@@ -1,4 +1,5 @@
-ï»¿using System.ComponentModel.DataAnnotations;
+using System;
+using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
 namespace SisAlmacenProductos.Models
@@ -9,7 +10,7 @@ namespace SisAlmacenProductos.Models
         public int Id { get; set; }
 
         [Required]
-        [RegularExpression(@"^\d{11}$", ErrorMessage = "El RUC debe tener exactamente 11 dÃ­gitos numÃ©ricos.")]
+        [RegularExpression(@"^\d{11}$", ErrorMessage = "El RUC debe tener exactamente 11 dígitos numéricos.")]
         public string RUC { get; set; }
 
         [Required] public string RazonSocial { get; set; }

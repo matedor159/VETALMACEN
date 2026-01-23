@@ -9,7 +9,7 @@ namespace SisAlmacenProductos.Data
         public DbSet<Orden> Ordenes { get; set; }
         public DbSet<Categoria> Categorias { get; set; }
         public DbSet<SubCategoria> SubCategorias { get; set; }
-        public DbSet<Rol> Roles { get; set; }
+
         public DbSet<Sucursal> Sucursales { get; set; }
         public DbSet<Proveedor> Proveedores { get; set; }
 
@@ -24,24 +24,21 @@ namespace SisAlmacenProductos.Data
         {
             base.OnModelCreating(modelBuilder);
 
+            // Mapping to existing database tables (lowercase names)
+            modelBuilder.Entity<User>().ToTable("usuario");
+            modelBuilder.Entity<Producto>().ToTable("producto");
+            modelBuilder.Entity<Orden>().ToTable("ordenes"); // Mapping restored
+            modelBuilder.Entity<Categoria>().ToTable("categoria");
+            modelBuilder.Entity<SubCategoria>().ToTable("subcategoria");
+            modelBuilder.Entity<Proveedor>().ToTable("proveedor");
+            modelBuilder.Entity<Rol>().ToTable("rol");
+            modelBuilder.Entity<OrdenEntrada>().ToTable("ordenentrada");
+            modelBuilder.Entity<DetalleOrdenEntrada>().ToTable("detalleordenentrada");
+
             modelBuilder.Entity<User>()
                 .Property(u => u.CreatedAt)
                 .HasDefaultValueSql("CURRENT_TIMESTAMP")
                 .ValueGeneratedOnAdd(); // Esto le dice a EF que lo genera la base de datos
-
-            // Un usuario solo puede tener 1 sucursal asociada
-            modelBuilder.Entity<Sucursal>()
-                .HasIndex(s => s.UserId)
-                .IsUnique();
-
-            modelBuilder.Entity<Proveedor>()
-                .HasIndex(p => p.UserId)
-                .IsUnique();
-
-            // RUC único
-            modelBuilder.Entity<Proveedor>()
-                .HasIndex(p => p.Ruc)
-                .IsUnique();
         }
 
     }

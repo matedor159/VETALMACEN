@@ -39,7 +39,22 @@
                     <i class="bi bi-clipboard-check display-4 text-warning"></i>
                     <h5 class="card-title mt-2">Solicitudes de Clientes</h5>
                     <p class="card-text">Aprobar o rechazar solicitudes de productos.</p>
-                    <a class="btn btn-outline-warning" asp-controller="Admin" asp-action="Solicitudes">Ver Solicitudes</a>
+                    <a class="btn btn-outline-warning" asp-controller="Ordenes" asp-action="Solicitudes">Ver Solicitudes</a>
+                </div>
+            </div>
+        </div>
+    }
+
+    @* Solicitud de Mercadería: Solo Almacenero (modificado a pedido del usuario) *@
+    @if (role == "Almacenero")
+    {
+        <div class="col-md-4 mb-3">
+            <div class="card h-100 shadow">
+                <div class="card-body text-center">
+                    <i class="bi bi-truck display-4 text-info"></i>
+                    <h5 class="card-title mt-2">Entrada de Mercadería</h5>
+                    <p class="card-text">Registrar reabastecimiento de stock.</p>
+                    <a class="btn btn-outline-info" asp-controller="OrdenEntrada" asp-action="Index">Gestionar Entradas</a>
                 </div>
             </div>
         </div>
@@ -55,6 +70,7 @@
                     <h5 class="card-title mt-2">Registro de Usuarios</h5>
                     <p class="card-text">Registrar vendedores o clientes en el sistema.</p>
                     <a class="btn btn-outline-success" asp-controller="Admin" asp-action="RegistrarUsuario">Registrar Usuario</a>
+                    <a class="btn btn-outline-secondary mt-2" asp-controller="Admin" asp-action="Usuarios">Ver Usuarios</a>
                 </div>
             </div>
         </div>

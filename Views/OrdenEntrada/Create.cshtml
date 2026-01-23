@@ -1,0 +1,192 @@
+@model SisAlmacenProductos.Models.OrdenEntrada
+
+@{
+    ViewData["Title"] = "Registrar Entrada";
+    var productos = ViewData["Productos"] as IEnumerable<dynamic>;
+}
+
+<div class="container-fluid px-4">
+    <h1 class="mt-4">Registrar Entrada de Mercadería</h1>
+    <div class="card mb-4">
+        <div class="card-header">
+            <i class="fas fa-boxes me-1"></i>
+            Nueva Orden de Entrada
+        </div>
+        <div class="card-body">
+            <form asp-action="Create" id="orderForm">
+                <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+                
+                <div class="row mb-3">
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <label asp-for="ProveedorId" class="control-label mb-1">Proveedor</label>
+                            <select asp-for="ProveedorId" class ="form-select" asp-items="ViewBag.ProveedorId">
+                                <option value="">-- Seleccione Proveedor --</option>
+                            </select>
+                            <span asp-validation-for="ProveedorId" class="text-danger"></span>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <label asp-for="Observacion" class="control-label mb-1">Observación</label>
+                            <input asp-for="Observacion" class="form-control" placeholder="Opcional" />
+                        </div>
+                    </div>
+                </div>
+
+                <hr />
+                <h5>Detalle de Productos</h5>
+                
+                <div class="row mb-3 align-items-end bg-light p-3 border rounded">
+                    <div class="col-md-3">
+                        <label class="control-label">Código Producto</label>
+                        <input type="text" id="inputCodigo" class="form-control" placeholder="Ingrese Código" onchange="buscarProducto()" />
+                    </div>
+                    <div class="col-md-4">
+                        <label class="control-label">Producto</label>
+                        <input type="text" id="inputNombre" class="form-control" readonly />
+                        <input type="hidden" id="inputProductoId" />
+                    </div>
+                    <div class="col-md-2">
+                        <label class="control-label">Cantidad</label>
+                         <input type="number" id="inputCantidad" class="form-control" min="1" value="1" />
+                    </div>
+                    <div class="col-md-2">
+                        <label class="control-label">Precio U.</label>
+                        <input type="number" id="inputPrecio" class="form-control" step="0.01" min="0" value="0.00" readonly />
+                    </div>
+                    <div class="col-md-1">
+                         <button type="button" class="btn btn-success w-100" onclick="agregarProducto()">
+                             <i class="fas fa-plus"></i>
+                         </button>
+                    </div>
+                </div>
+
+                <table class="table table-bordered table-hover" id="tablaDetalles">
+                    <thead class="table-dark">
+                        <tr>
+                            <th>Producto</th>
+                            <th style="width: 150px;">Cantidad</th>
+                            <th style="width: 150px;">Precio U.</th>
+                            <th style="width: 150px;">SubTotal</th>
+                            <th style="width: 80px;">Acción</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <!-- Filas dinámicas -->
+                    </tbody>
+                    <tfoot>
+                        <tr>
+                            <td colspan="3" class="text-end fw-bold">Total General:</td>
+                            <td id="totalGeneral" class="fw-bold">0.00</td>
+                            <td></td>
+                        </tr>
+                    </tfoot>
+                </table>
+
+                <div class="mt-4 mb-3">
+                    <button type="submit" class="btn btn-primary btn-lg">
+                        <i class="fas fa-save"></i> Guardar Entrada
+                    </button>
+                    <a asp-action="Index" class="btn btn-secondary btn-lg ms-2">Cancelar</a>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+    
+    <script>
+        async function buscarProducto() {
+            var codigo = document.getElementById("inputCodigo").value;
+            if (!codigo) return;
+
+            try {
+                const response = await fetch(`/OrdenEntrada/GetProductoByCodigo?codigo=${codigo}`);
+                const data = await response.json();
+
+                if (data.success) {
+                    document.getElementById("inputNombre").value = data.nombre;
+                    document.getElementById("inputProductoId").value = data.id;
+                    document.getElementById("inputPrecio").value = data.precio;
+                } else {
+                    alert(data.message);
+                    limpiarInputsProducto();
+                }
+            } catch (error) {
+                console.error("Error al buscar producto:", error);
+                alert("Error al buscar el producto.");
+            }
+        }
+
+        function limpiarInputsProducto() {
+            document.getElementById("inputNombre").value = "";
+            document.getElementById("inputProductoId").value = "";
+            document.getElementById("inputPrecio").value = "0.00";
+        }
+
+        function agregarProducto() {
+            var prodId = document.getElementById("inputProductoId").value;
+            var prodNombre = document.getElementById("inputNombre").value;
+            var cantidad = parseFloat(document.getElementById("inputCantidad").value);
+            var precio = parseFloat(document.getElementById("inputPrecio").value);
+
+            if (!prodId || cantidad <= 0) {
+                alert("Por favor busque un producto válido e ingrese una cantidad.");
+                return;
+            }
+
+            var subtotal = cantidad * precio;
+            var tbody = document.querySelector("#tablaDetalles tbody");
+            
+            var row = `
+                <tr>
+                    <td>
+                        <input type="hidden" name="productoIds" value="${prodId}" />
+                        ${prodNombre}
+                    </td>
+                    <td>
+                        <input type="hidden" name="cantidades" value="${cantidad}" />
+                        ${cantidad}
+                    </td>
+                    <td>
+                        <input type="hidden" name="precios" value="${precio}" />
+                        ${precio.toFixed(2)}
+                    </td>
+                    <td class="subtotal">${subtotal.toFixed(2)}</td>
+                    <td>
+                        <button type="button" class="btn btn-danger btn-sm" onclick="eliminarFila(this)">
+                            <i class="fas fa-trash"></i>
+                        </button>
+                    </td>
+                </tr>
+            `;
+
+            tbody.insertAdjacentHTML('beforeend', row);
+            calcularTotal();
+            
+            // Reset fields
+            document.getElementById("inputCodigo").value = "";
+            document.getElementById("inputCantidad").value = 1;
+            limpiarInputsProducto();
+            document.getElementById("inputCodigo").focus();
+        }
+
+        function eliminarFila(btn) {
+            var row = btn.closest("tr");
+            row.remove();
+            calcularTotal();
+        }
+
+        function calcularTotal() {
+            var subtotales = document.querySelectorAll(".subtotal");
+            var total = 0;
+            subtotales.forEach(function(td) {
+                total += parseFloat(td.innerText);
+            });
+            document.getElementById("totalGeneral").innerText = total.toFixed(2);
+        }
+    </script>
+}

@@ -22,6 +22,17 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Compile Remove="TestPruebasUnitarias\**" />
+    <Content Remove="TestPruebasUnitarias\**" />
+    <EmbeddedResource Remove="TestPruebasUnitarias\**" />
+    <None Remove="TestPruebasUnitarias\**" />
+    <Compile Remove="PruebasUnitarias\**" />
+    <Content Remove="PruebasUnitarias\**" />
+    <EmbeddedResource Remove="PruebasUnitarias\**" />
+    <None Remove="PruebasUnitarias\**" />
+  </ItemGroup>
+
+  <ItemGroup>
     <None Update=".tt">
       <Generator>TextTemplatingFileGenerator</Generator>
       <LastGenOutput>.txt</LastGenOutput>

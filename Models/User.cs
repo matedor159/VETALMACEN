@@ -4,7 +4,6 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace SisAlmacenProductos.Models
 {
-    [Table("usuario")]
     public class User
     {
         public int Id { get; set; }
@@ -16,11 +15,10 @@ namespace SisAlmacenProductos.Models
         [Required, StringLength(100, MinimumLength = 8)]
         public string Password { get; set; }
 
-        [Required]
-        public int RolId { get; set; }
-
-        [ForeignKey("RolId")]
-        public virtual Rol Rol { get; set; }
+        [Required(ErrorMessage = "El rol es obligatorio.")]
+        [RegularExpression("^(Administrador|Almacenero|Cliente|Logistica)$",
+    ErrorMessage = "El rol debe ser Administrador, Almacenero, Cliente o Logistica.")]
+        public string Role { get; set; }
 
         public DateTime CreatedAt { get; set; }
     }
