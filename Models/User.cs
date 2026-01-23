@@ -2,6 +2,15 @@
 using System.ComponentModel.DataAnnotations.Schema;
 namespace SisAlmacenProductos.Models
 {
+    [Table("usuario")]
+    public class User
+    {
+        // ...
+    }
+}
+
+namespace SisAlmacenProductos.Models
+{
     public class User
     {
         public int Id { get; set; }
