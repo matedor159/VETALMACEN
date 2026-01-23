@@ -9,9 +9,10 @@ namespace SisAlmacenProductos.Data
         public DbSet<Orden> Ordenes { get; set; }
         public DbSet<Categoria> Categorias { get; set; }
         public DbSet<SubCategoria> SubCategorias { get; set; }
-
+        public DbSet<Rol> Roles { get; set; }
         public DbSet<Sucursal> Sucursales { get; set; }
-public DbSet<Proveedor> Proveedores { get; set; }
+        public DbSet<Proveedor> Proveedores { get; set; }
+
 
 
         public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options)

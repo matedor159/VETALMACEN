@@ -25,6 +25,7 @@
             <th>Descripción</th>
             <th>Marca</th>
             <th>Categoría</th>
+            <th>Subcategoría</th>
             <th>Precio</th>
             <th>Stock</th>
             <th>Imagen</th>
@@ -39,26 +40,26 @@
                 <td>@producto.Nombre</td>
                 <td>@producto.Descripcion</td>
                 <td>@producto.Marca</td>
-                <td>@producto.Categoria</td>
-                <td>S/. @producto.Precio</td>
+                <td>@producto.SubCategoria?.Categoria?.Nombre</td>
+                <td>@producto.SubCategoria?.Nombre</td>
+                <td>S/. @string.Format("{0:N2}", producto.Precio)</td>
                 <td>@producto.Stock</td>
                 <td>
                     @if (!string.IsNullOrEmpty(producto.ImagenUrl))
                     {
-                        <img src="@producto.ImagenUrl" alt="Imagen" width="60" />
+                        <img src="@producto.ImagenUrl" alt="Imagen" style="max-width:60px; max-height:60px; object-fit:cover;" />
                     }
                 </td>
                 <td>
                     @if (rolUsuario != "Almacenero")
                     {
-                    <a class="btn btn-sm btn-primary" asp-action="EditarProducto" asp-route-id="@producto.Id">
-                        <i class="bi bi-pencil-square"></i>
-                    </a>
+                        <a class="btn btn-sm btn-primary" asp-action="EditarProducto" asp-route-id="@producto.Id" title="Editar">
+                            <i class="bi bi-pencil-square"></i>
+                        </a>
 
-
-                    <a class="btn btn-sm btn-danger" asp-action="EliminarProducto" asp-route-id="@producto.Id">
+                        <a class="btn btn-sm btn-danger" asp-action="EliminarProducto" asp-route-id="@producto.Id" title="Eliminar">
                             <i class="bi bi-trash"></i>
-                    </a>
+                        </a>
                     }
 
                     @if (rolUsuario == "Almacenero")

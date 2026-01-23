@@ -87,47 +87,35 @@ namespace SisAlmacenProductos.Controllers
         ====================================================== */
 
 
-        [HttpGet]
-        [Authorize(Roles = "Administrador")]
-        public IActionResult RegistrarUsuarioAlmacen()
+        public IActionResult AgregarUsuarioAlmacen()
         {
-            return View();
+            var roles = _context.Roles
+                .Where(r => r.Nombre == "Administrador" || r.Nombre == "Logistica" || r.Nombre == "Almacenero")
+                .ToList();
+
+            ViewBag.Roles = roles;
+            return View("RegistrarUsuarioAlmacen");
         }
+
 
         [HttpPost]
-        [Authorize(Roles = "Administrador")]
-        public IActionResult RegistrarUsuarioAlmacen(Models.ViewModels.RegistrarUsuarioAlmacenVM model)
+        public IActionResult AgregarUsuarioAlmacen(User model)
         {
-            if (!ModelState.IsValid) return View(model);
-
-            var rolesPermitidos = new[] { "Administrador", "Logistica", "Almacenero" };
-            if (!rolesPermitidos.Contains(model.Role))
-            {
-                ModelState.AddModelError("", "Rol no permitido para Usuario Almacén.");
-                return View(model);
-            }
-
             if (_context.Users.Any(u => u.Username == model.Username))
+                ModelState.AddModelError("Username", "Ya existe un usuario con ese nombre.");
+
+            if (!ModelState.IsValid)
             {
-                ModelState.AddModelError("", "El usuario ya existe.");
-                return View(model);
+                ViewBag.Roles = _context.Roles
+                    .Where(r => r.Nombre == "Administrador" || r.Nombre == "Logistica" || r.Nombre == "Almacenero")
+                    .ToList();
+                return View("RegistrarUsuarioAlmacen", model);
             }
 
-            var user = new User
-            {
-                Username = model.Username,
-                Password = HashPassword(model.Password),
-                Role = model.Role,
-                CreatedAt = DateTime.Now
-            };
-
-            _context.Users.Add(user);
+            _context.Users.Add(model);
             _context.SaveChanges();
-
-            TempData["SuccessMessage"] = "Usuario de almacén registrado correctamente.";
             return RedirectToAction("Usuarios");
         }
-
 
 
 
@@ -135,51 +123,35 @@ namespace SisAlmacenProductos.Controllers
            SUCURSAL
         ====================================================== */
 
-
-        [HttpGet]
-        [Authorize(Roles = "Administrador")]
-        public IActionResult RegistrarSucursal()
-        {
-            return View();
-        }
+        public IActionResult AgregarSucursal() => View("RegistrarSucursal");
 
         [HttpPost]
-        [Authorize(Roles = "Administrador")]
-        public IActionResult RegistrarSucursal(Models.ViewModels.RegistrarSucursalVM model)
+        public IActionResult AgregarSucursal(string username, string password, string nombreSucursal, string direccion, string telefono)
         {
-            if (!ModelState.IsValid) return View(model);
+            if (_context.Users.Any(u => u.Username == username))
+                ModelState.AddModelError("Username", "Ya existe un usuario con ese nombre.");
 
-            if (_context.Users.Any(u => u.Username == model.Username))
-            {
-                ModelState.AddModelError("", "El usuario ya existe.");
-                return View(model);
-            }
+            if (!ModelState.IsValid) return View("RegistrarSucursal");
 
-            var user = new User
-            {
-                Username = model.Username,
-                Password = HashPassword(model.Password),
-                Role = "Sucursal",
-                CreatedAt = DateTime.Now
-            };
+            var rolSucursal = _context.Roles.First(r => r.Nombre == "Sucursal");
 
+            var user = new User { Username = username, Password = password, RolId = rolSucursal.Id, CreatedAt = DateTime.Now };
             _context.Users.Add(user);
             _context.SaveChanges();
 
             var sucursal = new Sucursal
             {
-                NombreSucursal = model.NombreSucursal,
-                Direccion = model.Direccion,
-                Telefono = model.Telefono,
-                UserId = user.Id
+                NombreSucursal = nombreSucursal,
+                Direccion = direccion,
+                Telefono = telefono,
+                UsuarioId = user.Id
             };
-
             _context.Sucursales.Add(sucursal);
             _context.SaveChanges();
 
-            TempData["SuccessMessage"] = "Sucursal registrada correctamente.";
             return RedirectToAction("Usuarios");
         }
+
 
 
 
@@ -187,62 +159,78 @@ namespace SisAlmacenProductos.Controllers
            PROVEEDOR
         ====================================================== */
 
-
-        [HttpGet]
-        [Authorize(Roles = "Administrador")]
-        public IActionResult RegistrarProveedor()
+        public IActionResult AgregarProveedor()
         {
-            return View();
+            return View("RegistrarProveedor");
         }
 
         [HttpPost]
-        [Authorize(Roles = "Administrador")]
-        public IActionResult RegistrarProveedor(Models.ViewModels.RegistrarProveedorVM model)
+        public IActionResult AgregarProveedor(
+    string username,
+    string password,
+    string ruc,
+    string razonSocial,
+    string telefono,
+    string direccion,
+    string correoElectronico,
+    string nombreContacto
+)
         {
-            if (!ModelState.IsValid) return View(model);
-
-            if (_context.Users.Any(u => u.Username == model.Username))
+            // Validar usuario duplicado
+            if (_context.Users.Any(u => u.Username == username))
             {
-                ModelState.AddModelError("", "El usuario ya existe.");
-                return View(model);
+                ModelState.AddModelError("Username", "Ya existe un usuario con ese nombre.");
             }
 
-            if (_context.Proveedores.Any(p => p.Ruc == model.Ruc))
+            // Validar RUC: solo números y exactamente 11 caracteres
+            if (string.IsNullOrEmpty(ruc) || !System.Text.RegularExpressions.Regex.IsMatch(ruc, @"^\d{11}$"))
             {
-                ModelState.AddModelError("", "Ya existe un proveedor con ese RUC.");
-                return View(model);
+                ModelState.AddModelError("RUC", "El RUC debe contener exactamente 11 dígitos numéricos.");
             }
 
+            // Validar email
+            if (!new System.ComponentModel.DataAnnotations.EmailAddressAttribute().IsValid(correoElectronico))
+            {
+                ModelState.AddModelError("CorreoElectronico", "El correo electrónico no es válido.");
+            }
+
+            if (!ModelState.IsValid)
+            {
+                return View("RegistrarProveedor");
+            }
+
+            // Obtener rol Proveedor
+            var rolProveedor = _context.Roles.First(r => r.Nombre == "Proveedor");
+
+            // Crear usuario
             var user = new User
             {
-                Username = model.Username,
-                Password = HashPassword(model.Password),
-                Role = "Proveedor",
+                Username = username,
+                Password = password, // ⚠️ luego puedes hashearlo
+                RolId = rolProveedor.Id,
                 CreatedAt = DateTime.Now
             };
 
             _context.Users.Add(user);
             _context.SaveChanges();
 
+            // Crear proveedor relacionado
             var proveedor = new Proveedor
             {
-                Ruc = model.Ruc,
-                RazonSocial = model.RazonSocial,
-                Telefono = model.Telefono,
-                Direccion = model.Direccion,
-                CorreoElectronico = model.CorreoElectronico,
-                NombreContacto = model.NombreContacto,
-                UserId = user.Id
+                RUC = ruc,
+                RazonSocial = razonSocial,
+                Telefono = telefono,
+                Direccion = direccion,
+                CorreoElectronico = correoElectronico,
+                NombreContacto = nombreContacto,
+                UsuarioId = user.Id
             };
 
             _context.Proveedores.Add(proveedor);
             _context.SaveChanges();
 
-            TempData["SuccessMessage"] = "Proveedor registrado correctamente.";
             return RedirectToAction("Usuarios");
         }
-
-
 
 
         /* ======================================================
