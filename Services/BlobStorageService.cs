@@ -1,4 +1,3 @@
-﻿// File: Services/BlobStorageService.cs
 using System;
 using System.IO;
 using System.Threading.Tasks;
@@ -16,7 +15,6 @@ namespace SisAlmacenProductos.Services
 
         public BlobStorageService(IConfiguration configuration)
         {
-            // Lee la connection string y el container desde appsettings o variables de entorno
             var conn = configuration["AzureStorage:ConnectionString"]
                        ?? Environment.GetEnvironmentVariable("AZURE_STORAGE_CONNECTION_STRING");
             _containerName = configuration["AzureStorage:ContainerName"]
@@ -29,9 +27,6 @@ namespace SisAlmacenProductos.Services
             _blobServiceClient = new BlobServiceClient(conn);
         }
 
-        /// <summary>
-        /// Sube el archivo al contenedor y retorna la URL pública del blob.
-        /// </summary>
         public async Task<string> UploadFileAsync(IFormFile file, string folder = "productos")
         {
             if (file == null || file.Length == 0) return null;
@@ -57,9 +52,6 @@ namespace SisAlmacenProductos.Services
             return blobClient.Uri.AbsoluteUri;
         }
 
-        /// <summary>
-        /// Elimina un blob a partir de su URL si existe.
-        /// </summary>
         public async Task DeleteFileIfExistsAsync(string blobUrl)
         {
             if (string.IsNullOrWhiteSpace(blobUrl)) return;
