@@ -14,6 +14,10 @@ namespace SisAlmacenProductos.Data
         public DbSet<DetalleOrdenEntrada> DetallesOrdenEntrada { get; set; }
         public DbSet<Rol> Roles { get; set; }
 
+        public DbSet<Sucursal> Sucursales { get; set; }
+public DbSet<Proveedor> Proveedores { get; set; }
+
+
         public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options)
             : base(options)
         {
@@ -37,7 +41,7 @@ namespace SisAlmacenProductos.Data
             modelBuilder.Entity<User>()
                 .Property(u => u.CreatedAt)
                 .HasDefaultValueSql("CURRENT_TIMESTAMP")
-                .ValueGeneratedOnAdd();
+                .ValueGeneratedOnAdd(); // Esto le dice a EF que lo genera la base de datos
         }
 
     }

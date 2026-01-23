@@ -7,8 +7,17 @@
 <h2>Usuarios Registrados</h2>
 
 <div class="d-flex gap-2 mb-3">
-    <a asp-action="AgregarUsuario" class="btn btn-success">
-        <i class="bi bi-person-plus-fill"></i> Agregar Usuario
+
+    <a asp-action="RegistrarUsuarioAlmacen" class="btn btn-success">
+        <i class="fas fa-user-plus"></i> Agregar Usuario Almacén
+    </a>
+
+    <a asp-action="RegistrarSucursal" class="btn btn-primary ms-2">
+        <i class="fas fa-store"></i> Agregar Sucursal
+    </a>
+
+    <a asp-action="RegistrarProveedor" class="btn btn-warning ms-2">
+        <i class="fas fa-truck"></i> Agregar Proveedor
     </a>
 
     <form asp-action="ExportarUsuariosExcel" method="post">

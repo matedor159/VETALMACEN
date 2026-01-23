@@ -1,0 +1,79 @@
+﻿@model SisAlmacenProductos.Models.ViewModels.RegistrarProveedorVM
+
+@{
+    ViewBag.Title = "Registrar Proveedor";
+}
+
+<h2>Registrar Proveedor</h2>
+
+@if (TempData["SuccessMessage"] != null)
+{
+    <div class="alert alert-success">@TempData["SuccessMessage"]</div>
+}
+
+<form asp-action="RegistrarProveedor" method="post" novalidate>
+    <div class="form-group mb-3">
+        <label for="Username">Nombre de Usuario</label>
+        @Html.TextBoxFor(m => m.Username, new { @class = "form-control", placeholder = "Ingrese nombre de usuario" })
+        @Html.ValidationMessageFor(m => m.Username, "", new { @class = "text-danger" })
+    </div>
+
+    <div class="form-group mb-3">
+        <label for="Password">Contraseña</label>
+        @Html.PasswordFor(m => m.Password, new { @class = "form-control", placeholder = "Ingrese contraseña" })
+        @Html.ValidationMessageFor(m => m.Password, "", new { @class = "text-danger" })
+    </div>
+
+    <hr />
+
+    <div class="form-group mb-3">
+        <label for="Ruc">RUC (11 dígitos)</label>
+        @Html.TextBoxFor(m => m.Ruc, new {
+        @class = "form-control",
+                placeholder = "Ej: 20123456789",
+                maxlength = "11",
+                pattern = @"^\d{11}$",
+                inputmode = "numeric",
+                oninput = "this.value = this.value.replace(/[^0-9]/g,'');"
+                })
+        <small class="form-text text-muted">Ingrese solo números. Debe tener exactamente 11 dígitos.</small>
+        @Html.ValidationMessageFor(m => m.Ruc, "", new { @class = "text-danger" })
+    </div>
+
+    <div class="form-group mb-3">
+        <label for="RazonSocial">Razón Social</label>
+        @Html.TextBoxFor(m => m.RazonSocial, new { @class = "form-control", placeholder = "Razón social" })
+        @Html.ValidationMessageFor(m => m.RazonSocial, "", new { @class = "text-danger" })
+    </div>
+
+    <div class="form-group mb-3">
+        <label for="Telefono">Teléfono</label>
+        @Html.TextBoxFor(m => m.Telefono, new { @class = "form-control", placeholder = "Teléfono", inputmode = "numeric" })
+        @Html.ValidationMessageFor(m => m.Telefono, "", new { @class = "text-danger" })
+    </div>
+
+    <div class="form-group mb-3">
+        <label for="Direccion">Dirección</label>
+        @Html.TextBoxFor(m => m.Direccion, new { @class = "form-control", placeholder = "Dirección" })
+        @Html.ValidationMessageFor(m => m.Direccion, "", new { @class = "text-danger" })
+    </div>
+
+    <div class="form-group mb-3">
+        <label for="CorreoElectronico">Correo Electrónico</label>
+        @Html.TextBoxFor(m => m.CorreoElectronico, new { @class = "form-control", placeholder = "correo@ejemplo.com", type = "email" })
+        @Html.ValidationMessageFor(m => m.CorreoElectronico, "", new { @class = "text-danger" })
+    </div>
+
+    <div class="form-group mb-3">
+        <label for="NombreContacto">Nombre de Contacto</label>
+        @Html.TextBoxFor(m => m.NombreContacto, new { @class = "form-control", placeholder = "Nombre de la persona de contacto" })
+        @Html.ValidationMessageFor(m => m.NombreContacto, "", new { @class = "text-danger" })
+    </div>
+
+    <button type="submit" class="btn btn-success mt-3">Registrar Proveedor</button>
+    <a asp-action="Usuarios" class="btn btn-secondary mt-3 ms-2">Cancelar</a>
+</form>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

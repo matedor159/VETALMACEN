@@ -1,14 +1,17 @@
-using System;
-using System.ComponentModel.DataAnnotations;
+ï»¿using System.ComponentModel.DataAnnotations;
 
-namespace SisAlmacenProductos.Models
+namespace SisAlmacenProductos.Models.ViewModels
 {
-    public class Proveedor
+    public class RegistrarProveedorVM
     {
-        public int Id { get; set; }
+        [Required]
+        public string Username { get; set; } = string.Empty;
 
         [Required]
-        [RegularExpression(@"^\d{11}$", ErrorMessage = "El RUC debe tener exactamente 11 dígitos numéricos.")]
+        public string Password { get; set; } = string.Empty;
+
+        [Required]
+        [RegularExpression(@"^\d{11}$", ErrorMessage = "El RUC debe tener exactamente 11 dÃ­gitos numÃ©ricos.")]
         public string Ruc { get; set; } = string.Empty;
 
         [Required]
@@ -21,14 +24,10 @@ namespace SisAlmacenProductos.Models
         public string Direccion { get; set; } = string.Empty;
 
         [Required]
-        [EmailAddress(ErrorMessage = "Correo electrónico inválido.")]
+        [EmailAddress(ErrorMessage = "Correo electrÃ³nico invÃ¡lido.")]
         public string CorreoElectronico { get; set; } = string.Empty;
 
         [Required]
         public string NombreContacto { get; set; } = string.Empty;
-
-        // Relación con Users
-        public int UserId { get; set; }
-        public User? User { get; set; }
     }
 }

@@ -291,6 +291,169 @@ namespace SisAlmacenProductos.Controllers
         }
 
         /* ======================================================
+           USUARIO ALMACEN
+        ====================================================== */
+
+
+        [HttpGet]
+        [Authorize(Roles = "Administrador")]
+        public IActionResult RegistrarUsuarioAlmacen()
+        {
+            return View();
+        }
+
+        [HttpPost]
+        [Authorize(Roles = "Administrador")]
+        public IActionResult RegistrarUsuarioAlmacen(Models.ViewModels.RegistrarUsuarioAlmacenVM model)
+        {
+            if (!ModelState.IsValid) return View(model);
+
+            var rolesPermitidos = new[] { "Administrador", "Logistica", "Almacenero" };
+            if (!rolesPermitidos.Contains(model.Role))
+            {
+                ModelState.AddModelError("", "Rol no permitido para Usuario Almacén.");
+                return View(model);
+            }
+
+            if (_context.Users.Any(u => u.Username == model.Username))
+            {
+                ModelState.AddModelError("", "El usuario ya existe.");
+                return View(model);
+            }
+
+            var user = new User
+            {
+                Username = model.Username,
+                Password = HashPassword(model.Password),
+                Role = model.Role,
+                CreatedAt = DateTime.Now
+            };
+
+            _context.Users.Add(user);
+            _context.SaveChanges();
+
+            TempData["SuccessMessage"] = "Usuario de almacén registrado correctamente.";
+            return RedirectToAction("Usuarios");
+        }
+
+
+
+
+        /* ======================================================
+           SUCURSAL
+        ====================================================== */
+
+
+        [HttpGet]
+        [Authorize(Roles = "Administrador")]
+        public IActionResult RegistrarSucursal()
+        {
+            return View();
+        }
+
+        [HttpPost]
+        [Authorize(Roles = "Administrador")]
+        public IActionResult RegistrarSucursal(Models.ViewModels.RegistrarSucursalVM model)
+        {
+            if (!ModelState.IsValid) return View(model);
+
+            if (_context.Users.Any(u => u.Username == model.Username))
+            {
+                ModelState.AddModelError("", "El usuario ya existe.");
+                return View(model);
+            }
+
+            var user = new User
+            {
+                Username = model.Username,
+                Password = HashPassword(model.Password),
+                Role = "Sucursal",
+                CreatedAt = DateTime.Now
+            };
+
+            _context.Users.Add(user);
+            _context.SaveChanges();
+
+            var sucursal = new Sucursal
+            {
+                NombreSucursal = model.NombreSucursal,
+                Direccion = model.Direccion,
+                Telefono = model.Telefono,
+                UserId = user.Id
+            };
+
+            _context.Sucursales.Add(sucursal);
+            _context.SaveChanges();
+
+            TempData["SuccessMessage"] = "Sucursal registrada correctamente.";
+            return RedirectToAction("Usuarios");
+        }
+
+
+
+        /* ======================================================
+           PROVEEDOR
+        ====================================================== */
+
+
+        [HttpGet]
+        [Authorize(Roles = "Administrador")]
+        public IActionResult RegistrarProveedor()
+        {
+            return View();
+        }
+
+        [HttpPost]
+        [Authorize(Roles = "Administrador")]
+        public IActionResult RegistrarProveedor(Models.ViewModels.RegistrarProveedorVM model)
+        {
+            if (!ModelState.IsValid) return View(model);
+
+            if (_context.Users.Any(u => u.Username == model.Username))
+            {
+                ModelState.AddModelError("", "El usuario ya existe.");
+                return View(model);
+            }
+
+            if (_context.Proveedores.Any(p => p.Ruc == model.Ruc))
+            {
+                ModelState.AddModelError("", "Ya existe un proveedor con ese RUC.");
+                return View(model);
+            }
+
+            var user = new User
+            {
+                Username = model.Username,
+                Password = HashPassword(model.Password),
+                Role = "Proveedor",
+                CreatedAt = DateTime.Now
+            };
+
+            _context.Users.Add(user);
+            _context.SaveChanges();
+
+            var proveedor = new Proveedor
+            {
+                Ruc = model.Ruc,
+                RazonSocial = model.RazonSocial,
+                Telefono = model.Telefono,
+                Direccion = model.Direccion,
+                CorreoElectronico = model.CorreoElectronico,
+                NombreContacto = model.NombreContacto,
+                UserId = user.Id
+            };
+
+            _context.Proveedores.Add(proveedor);
+            _context.SaveChanges();
+
+            TempData["SuccessMessage"] = "Proveedor registrado correctamente.";
+            return RedirectToAction("Usuarios");
+        }
+
+
+
+
+        /* ======================================================
            EXPORTAR EXCEL
         ====================================================== */
 
