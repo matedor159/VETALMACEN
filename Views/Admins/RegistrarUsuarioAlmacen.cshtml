@@ -1,0 +1,44 @@
+﻿@model SisAlmacenProductos.Models.ViewModels.RegistrarUsuarioAlmacenVM
+
+@{
+    ViewBag.Title = "Registrar Usuario Almacén";
+}
+
+<h2>Registrar Usuario Almacén</h2>
+
+@if (TempData["SuccessMessage"] != null)
+{
+    <div class="alert alert-success">@TempData["SuccessMessage"]</div>
+}
+
+<form asp-action="RegistrarUsuarioAlmacen" method="post" novalidate>
+    <div class="form-group mb-3">
+        <label for="Username">Nombre de Usuario</label>
+        @Html.TextBoxFor(m => m.Username, new { @class = "form-control", placeholder = "Ingrese nombre de usuario" })
+        @Html.ValidationMessageFor(m => m.Username, "", new { @class = "text-danger" })
+    </div>
+
+    <div class="form-group mb-3">
+        <label for="Password">Contraseña</label>
+        @Html.PasswordFor(m => m.Password, new { @class = "form-control", placeholder = "Ingrese contraseña" })
+        @Html.ValidationMessageFor(m => m.Password, "", new { @class = "text-danger" })
+    </div>
+
+    <div class="form-group mb-3">
+        <label asp-for="Role" class="form-label">Rol</label>
+        <select asp-for="Role" class="form-control">
+            <option value="">-- Selecciona un rol --</option>
+            <option value="Administrador">Administrador</option>
+            <option value="Logistica">Logística</option>
+            <option value="Almacenero">Almacenero</option>
+        </select>
+        <span asp-validation-for="Role" class="text-danger"></span>
+    </div>
+
+    <button type="submit" class="btn btn-success mt-3">Registrar</button>
+    <a asp-action="Usuarios" class="btn btn-secondary mt-3 ms-2">Cancelar</a>
+</form>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}
