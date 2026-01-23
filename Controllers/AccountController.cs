@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Mvc;
 using SisAlmacenProductos.Data;
+using Microsoft.EntityFrameworkCore;
 using System.Linq;
 using SisAlmacenProductos.Models;
 using System.Security.Claims;
@@ -26,6 +27,8 @@ namespace SisAlmacenProductos.Controllers
 
         public IActionResult Login()
         {
+            // User requested to always show Login screen first, disabling auto-redirect
+            /*
             if (User.Identity.IsAuthenticated)
             {
                 if (User.IsInRole("Administrador") || User.IsInRole("Almacenero") || User.IsInRole("Logistica"))
@@ -34,6 +37,7 @@ namespace SisAlmacenProductos.Controllers
                 if (User.IsInRole("Cliente"))
                     return RedirectToAction("VistaCliente", "Admin");
             }
+            */
 
             return View();
         }
@@ -67,16 +71,25 @@ namespace SisAlmacenProductos.Controllers
                 return View();
             }
 
-            var user = _context.Users.FirstOrDefault(u => u.Username == username);
+            var user = _context.Users
+                .Include(u => u.Rol)
+                .FirstOrDefault(u => u.Username == username);
 
-            if (user != null && VerifyHashedPassword(user.Password, password))
+            if (user == null)
+            {
+                ViewBag.Error = "El usuario no existe.";
+                return View();
+            }
+
+            if (VerifyHashedPassword(user.Password, password))
             {
                 // 🔐 Crear lista de claims
+                var roleName = user.Rol.Nombre;
                 var claims = new List<Claim>
                 {
                     new Claim(ClaimTypes.Name, user.Username),
-                    new Claim(ClaimTypes.Role, user.Role),
-                    new Claim("Role", user.Role),
+                    new Claim(ClaimTypes.Role, roleName),
+                    new Claim("Role", roleName),
                     new Claim("UserId", user.Id.ToString())
                 };
 
@@ -88,10 +101,11 @@ namespace SisAlmacenProductos.Controllers
                 await HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, principal);
 
                 // (opcional) guardar en sesión también
-                HttpContext.Session.SetString("Role", user.Role);
+                HttpContext.Session.SetString("Role", roleName);
                 HttpContext.Session.SetString("Username", user.Username);
 
-                if (user.Role == "Cliente")
+                if (roleName.Trim().Equals("Cliente", StringComparison.OrdinalIgnoreCase) || 
+                    roleName.Trim().Equals("Sucursal", StringComparison.OrdinalIgnoreCase))
                 {
                     return RedirectToAction("VistaCliente", "Admin");
                 }

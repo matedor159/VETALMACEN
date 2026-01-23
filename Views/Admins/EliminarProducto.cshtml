@@ -13,7 +13,7 @@
 <div class="card">
     <div class="card-body">
         <h4 class="card-title">@Model.Nombre</h4>
-        <p><strong>Categoría:</strong> @Model.Categoria</p>
+        <p><strong>Categoría:</strong> @Model.SubCategoria?.Nombre</p>
         <p><strong>Precio:</strong> S/. @Model.Precio</p>
         <p><strong>Stock:</strong> @Model.Stock</p>
         @if (!string.IsNullOrEmpty(Model.ImagenUrl))

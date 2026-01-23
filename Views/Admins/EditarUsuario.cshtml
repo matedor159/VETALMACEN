@@ -22,14 +22,14 @@
     </div>
 
     <div class="form-group">
-        <label asp-for="Role"></label>
-        <select asp-for="Role" class="form-control">
-            <option value="Administrador">Administrador</option>
-            <option value="Almacenero">Almacenero</option> <!-- Cambiado aquí -->
-            <option value="Cliente">Cliente</option>
-            <option value="Logistica">Logística</option> <!-- Nuevo rol -->
+        <label asp-for="RolId" class="form-label">Rol</label>
+        <select asp-for="RolId" class="form-control">
+            <option value="1">Administrador</option>
+            <option value="2">Almacenero</option> <!-- Cambiado aquí -->
+            <option value="3">Cliente</option>
+            <option value="4">Logística</option> <!-- Nuevo rol -->
         </select>
-        <span asp-validation-for="Role" class="text-danger"></span>
+        <span asp-validation-for="RolId" class="text-danger"></span>
     </div>
 
     <button type="submit" class="btn btn-primary mt-3">Guardar Cambios</button>

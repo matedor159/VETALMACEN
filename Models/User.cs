@@ -18,9 +18,10 @@ namespace SisAlmacenProductos.Models
         public string Password { get; set; }
 
         [Required(ErrorMessage = "El rol es obligatorio.")]
-        [RegularExpression("^(Administrador|Almacenero|Cliente|Logistica)$",
-    ErrorMessage = "El rol debe ser Administrador, Almacenero, Cliente o Logistica.")]
-        public string Role { get; set; }
+        public int RolId { get; set; }
+
+        [ForeignKey("RolId")]
+        public virtual Rol Rol { get; set; }
 
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)] // <-- Esto es clave
         public DateTime CreatedAt { get; set; }
