@@ -10,15 +10,18 @@ namespace SisAlmacenProductos.Models
 
         [Required, StringLength(20, MinimumLength = 4)]
         [RegularExpression(@"^[a-zA-Z0-9_]+$", ErrorMessage = "El usuario solo puede contener letras, números y _.")]
-        public string Username { get; set; }
+        public string Username { get; set; } = string.Empty;
 
         [Required, StringLength(100, MinimumLength = 8)]
-        public string Password { get; set; }
+        public string Password { get; set; } = string.Empty;
 
-        [Required(ErrorMessage = "El rol es obligatorio.")]
-        [RegularExpression("^(Administrador|Almacenero|Cliente|Logistica)$",
-    ErrorMessage = "El rol debe ser Administrador, Almacenero, Cliente o Logistica.")]
-        public string Role { get; set; }
+        [RegularExpression(
+        "^(Administrador|Almacenero|Cliente|Logistica|Sucursal|Proveedor)$",
+        ErrorMessage = "Rol inválido.")]
+        public string Role { get; set; } = string.Empty;
+
+
+
 
         public DateTime CreatedAt { get; set; }
     }

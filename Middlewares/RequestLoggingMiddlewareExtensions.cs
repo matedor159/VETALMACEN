@@ -1,7 +1,12 @@
-public static class RequestLoggingMiddlewareExtensions
+using Microsoft.AspNetCore.Builder;
+
+namespace SisAlmacenProductos.Middlewares
 {
-    public static IApplicationBuilder UseRequestLogging(this IApplicationBuilder app)
+    public static class RequestLoggingMiddlewareExtensions
     {
-        return app.UseMiddleware<RequestLoggingMiddleware>();
+        public static IApplicationBuilder UseRequestLogging(this IApplicationBuilder app)
+        {
+            return app.UseMiddleware<RequestLoggingMiddleware>();
+        }
     }
 }

@@ -1,4 +1,6 @@
-public class AuditoriaService
+namespace SisAlmacenProductos.Services
+{
+    public class AuditoriaService
 {
     public void RegistrarAccion(
         string usuario,
@@ -11,4 +13,5 @@ public class AuditoriaService
             $"[{fecha}] Usuario:{usuario} Acción:{accion} Entidad:{entidad}"
         );
     }
+}
 }

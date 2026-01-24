@@ -8,6 +8,13 @@ using Azure.Storage.Blobs.Models;
 using System.Security.Cryptography;
 using Microsoft.AspNetCore.Cryptography.KeyDerivation;
 using ClosedXML.Excel;
+using System;
+using System.IO;
+using System.Linq;
+using System.Threading.Tasks;
+using Microsoft.AspNetCore.Http;
+using Microsoft.Extensions.Configuration;
+
 
 using System.Security.Claims; // <-- Added this
 
@@ -34,9 +41,8 @@ namespace SisAlmacenProductos.Controllers
         public IActionResult DashboardAdmin()
         {
             // Para mostrar el rol en la vista
-            ViewBag.Role = User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Role)?.Value;
-            var username = User.Identity.Name;
-            ViewBag.Username = username;
+            ViewBag.Role = User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Role)?.Value ?? "";
+            ViewBag.Username = User.Identity?.Name ?? "";
 
             return View("~/Views/Admins/DashboardAdmin.cshtml");
         }
@@ -58,7 +64,8 @@ namespace SisAlmacenProductos.Controllers
         [Authorize(Roles = "Cliente,Administrador,Sucursal")]
         public async Task<IActionResult> MisOrdenes()
         {
-            var username = User.Identity.Name;
+            var username = User.Identity?.Name;
+            if (string.IsNullOrEmpty(username)) return RedirectToAction("Login", "Account");
             var user = await _context.Users.FirstOrDefaultAsync(u => u.Username == username);
             if (user == null) return RedirectToAction("Login", "Account");
 
@@ -98,7 +105,8 @@ namespace SisAlmacenProductos.Controllers
         [Authorize(Roles = "Administrador")]
         public IActionResult Usuarios()
         {
-            var usuarios = _context.Users.Include(u => u.Rol).ToList();
+            var usuarios = _context.Users.ToList();
+
             return View("~/Views/Admins/Usuarios.cshtml", usuarios);
         }
 
@@ -115,8 +123,9 @@ namespace SisAlmacenProductos.Controllers
         public async Task<IActionResult> EliminarUsuario(int? id)
         {
              if (id == null) return NotFound();
-             var user = await _context.Users.Include(u => u.Rol).FirstOrDefaultAsync(u => u.Id == id);
-             if (user == null) return NotFound();
+            var user = await _context.Users.FirstOrDefaultAsync(u => u.Id == id);
+
+            if (user == null) return NotFound();
              return View("~/Views/Admins/EliminarUsuario.cshtml", user);
         }
 
@@ -126,6 +135,7 @@ namespace SisAlmacenProductos.Controllers
         public async Task<IActionResult> EliminarUsuarioConfirmed(int id)
         {
             var user = await _context.Users.FindAsync(id);
+            if (user == null) return NotFound();
             _context.Users.Remove(user);
             await _context.SaveChangesAsync();
             return RedirectToAction(nameof(Usuarios));
@@ -136,25 +146,25 @@ namespace SisAlmacenProductos.Controllers
         public async Task<IActionResult> EditarUsuario(int id, User user)
         {
             if (id != user.Id) return NotFound();
-            
-            // Remove navigation property from validation
-            ModelState.Remove("Rol");
+            user.Password ??= "";
 
+            // Remove navigation property from validation
             var existingUser = await _context.Users.AsNoTracking().FirstOrDefaultAsync(u => u.Id == id);
-            
-            if (existingUser != null && string.IsNullOrEmpty(user.Password)) {
-                // Keep existing password
+            if (existingUser == null) return NotFound();
+
+            if (string.IsNullOrEmpty(user.Password))
+            {
                 user.Password = existingUser.Password;
                 ModelState.Remove("Password");
             }
-            else if (!string.IsNullOrEmpty(user.Password))
+            else
             {
-                // Hash the new password
                 user.Password = HashPassword(user.Password);
             }
 
             user.CreatedAt = existingUser.CreatedAt;
             ModelState.Remove("CreatedAt");
+
 
             if (ModelState.IsValid) {
                 try {
@@ -243,6 +253,7 @@ namespace SisAlmacenProductos.Controllers
             }
 
             _context.Productos.Add(producto);
+            await _context.SaveChangesAsync();
             return RedirectToAction(nameof(Productos));
         }
 
@@ -297,11 +308,8 @@ namespace SisAlmacenProductos.Controllers
 
         public IActionResult AgregarUsuarioAlmacen()
         {
-            var roles = _context.Roles
-                .Where(r => r.Nombre == "Administrador" || r.Nombre == "Logistica" || r.Nombre == "Almacenero")
-                .ToList();
+            ViewBag.Roles = new[] { "Administrador", "Logistica", "Almacenero" };
 
-            ViewBag.Roles = roles;
             return View("RegistrarUsuarioAlmacen");
         }
 
@@ -314,9 +322,7 @@ namespace SisAlmacenProductos.Controllers
 
             if (!ModelState.IsValid)
             {
-                ViewBag.Roles = _context.Roles
-                    .Where(r => r.Nombre == "Administrador" || r.Nombre == "Logistica" || r.Nombre == "Almacenero")
-                    .ToList();
+                ViewBag.Roles = new[] { "Administrador", "Logistica", "Almacenero" };
                 return View("RegistrarUsuarioAlmacen", model);
             }
 
@@ -341,9 +347,14 @@ namespace SisAlmacenProductos.Controllers
 
             if (!ModelState.IsValid) return View("RegistrarSucursal");
 
-            var rolSucursal = _context.Roles.First(r => r.Nombre == "Sucursal");
+            var user = new User
+            {
+                Username = username,
+                Password = password,
+                Role = "Sucursal",
+                CreatedAt = DateTime.Now
+            };
 
-            var user = new User { Username = username, Password = password, RolId = rolSucursal.Id, CreatedAt = DateTime.Now };
             _context.Users.Add(user);
             _context.SaveChanges();
 
@@ -407,17 +418,17 @@ namespace SisAlmacenProductos.Controllers
                 return View("RegistrarProveedor");
             }
 
-            // Obtener rol Proveedor
-            var rolProveedor = _context.Roles.First(r => r.Nombre == "Proveedor");
+            // Obtener rol Proveedor, Crear usuario
 
-            // Crear usuario
+
             var user = new User
             {
                 Username = username,
-                Password = password, // ⚠️ luego puedes hashearlo
-                RolId = rolProveedor.Id,
+                Password = password,
+                Role = "Proveedor",
                 CreatedAt = DateTime.Now
             };
+
 
             _context.Users.Add(user);
             _context.SaveChanges();
@@ -542,6 +553,7 @@ namespace SisAlmacenProductos.Controllers
         public async Task<IActionResult> EliminarProductoConfirmed(int id)
         {
             var producto = await _context.Productos.FindAsync(id);
+            if (producto == null) return NotFound();
             _context.Productos.Remove(producto);
             await _context.SaveChangesAsync();
             return RedirectToAction(nameof(Productos));
